@@ -5,6 +5,9 @@ import SignUp from "./pages/signUp/SignUp";
 import { SignIn } from "./pages/signIn/SignIn";
 import { motion, AnimatePresence } from "framer-motion";
 import ShowProducts from "./pages/showProducts/ShowProducts";
+import Cart from "./pages/cart/Cart";
+import AllProducts from "./pages/allProducts/AllProducts";
+import SearchPage from "./pages/searchPage/SearchPage";
 
 function App() {
   const location = useLocation();
@@ -19,6 +22,14 @@ function App() {
             element={
               <AnimatedRoute>
                 <Home />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/search/:name"
+            element={
+              <AnimatedRoute>
+                <SearchPage />
               </AnimatedRoute>
             }
           />
@@ -43,6 +54,22 @@ function App() {
             element={
               <AnimatedRoute>
                 <ShowProducts />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <AnimatedRoute>
+                <Cart />
+              </AnimatedRoute>
+            }
+          />
+          <Route
+            path="/store"
+            element={
+              <AnimatedRoute>
+                <AllProducts />
               </AnimatedRoute>
             }
           />

@@ -1,158 +1,185 @@
-'use client'
-import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+"use client";
+import React, { useState, useEffect } from "react";
+import { Menu, Search, ShoppingCart, X } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 import Cookies from "universal-cookie";
+import { TextInput } from "flowbite-react";
 const cookies = new Cookies();
 
-
-
 export default function Navbar() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
-    const [isLoggedIn, setIsLoggedIn] = useState(!!cookies.get('USER-TOKEN'));
+  const [searchText, setSearchText] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!cookies.get("USER-TOKEN"));
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        // Update isLoggedIn state when component mounts to reflect current authentication status
-        setIsLoggedIn(!!cookies.get('USER-TOKEN'));
-    }, [cookies.get('USER-TOKEN')]);
+  useEffect(() => {
+    setIsLoggedIn(!!cookies.get("USER-TOKEN"));
+  }, [cookies.get("USER-TOKEN")]);
 
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen)
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    cookies.remove("USER-TOKEN", {
+      path: "/",
+    });
+    setIsLoggedIn(false);
+    localStorage.removeItem("userId");
+  };
+
+  const handleCartMessage = () => {
+    navigate("/signin");
+  };
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      navigate(`/search/${searchText}`);
     }
+  });
 
-    const handleLogout = () => {
-        cookies.remove("USER-TOKEN", {
-            path: '/'
-        });
-        setIsLoggedIn(false);
-    }
+  const handleSearch = () => {
+    navigate(`/search/${searchText}`);
+  };
 
-    return (
-        <div className="relative w-full bg-slate-300">
-            <div className="mx-auto flex max-w-7xl h-20 items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
-                <div className="inline-flex items-center space-x-2">
+  return (
+    <div className="relative w-full bg-slate-300">
+      <div className="mx-auto flex max-w-7xl h-20 items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
+        <div className="inline-flex items-center space-x-2">
+          <span className="font-bold text-2xl">Furniture</span>
+          {isLoggedIn ? (
+            <Link to="/cart">
+              <ShoppingCart />
+            </Link>
+          ) : (
+            <span onClick={handleCartMessage} className="cursor-pointer">
+              <ShoppingCart />
+            </span>
+          )}
+        </div>
+        <div className="hidden lg:block">
+          <ul className="inline-flex space-x-8 items-center">
+            <li className="flex items-center gap-2">
+              <TextInput
+                placeholder="search.."
+                type="search"
+                onChange={(e) => setSearchText(e.target.value)}
+              ></TextInput>
+              <Search onClick={handleSearch} className="cursor-pointer" />
+            </li>
+            <li>
+              <Link
+                to="/"
+                className="text-sm font-semibold text-gray-800 hover:text-gray-900"
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/store"
+                className="text-sm font-semibold text-gray-800 hover:text-gray-900"
+              >
+                All Products
+              </Link>
+            </li>
+          </ul>
+        </div>
+        {isLoggedIn ? (
+          // Show logout button if user is logged in
+          <div className="hidden lg:block">
+            <button
+              type="button"
+              className="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+              onClick={handleLogout}
+            >
+              Log out
+            </button>
+          </div>
+        ) : (
+          // Show signin and signup links if user is not logged in
+          <div className="hidden lg:block">
+            <Link
+              to="/signin"
+              type="button"
+              className="rounded-md mr-2 bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            >
+              Sign in
+            </Link>
+            <Link
+              to="/signup"
+              type="button"
+              className="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+            >
+              Sign Up
+            </Link>
+          </div>
+        )}
+        <div className="lg:hidden">
+          <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
+        </div>
+        {isMenuOpen && (
+          <div className="absolute inset-x-0 top-0 z-50 origin-top-right transform p-2 transition lg:hidden">
+            <div className="divide-y-2 divide-gray-50 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
+              <div className="px-5 pb-6 pt-5">
+                <div className="flex items-center justify-between">
+                  <div className="inline-flex items-center space-x-2">
                     <span className="font-bold">Furniture</span>
+                  </div>
+                  <div className="-mr-2">
+                    <button
+                      type="button"
+                      onClick={toggleMenu}
+                      className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                    >
+                      <span className="sr-only">Close menu</span>
+                      <X className="h-6 w-6" aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
-                <div className="hidden lg:block">
-                    <ul className="inline-flex space-x-8">
-                        <li>
-                            <Link
-                                to='/'
-                                className="text-sm font-semibold text-gray-800 hover:text-gray-900"
-                            >
-                                Home
-                            </Link>
-                        </li>
-                    </ul>
+                <div className="mt-6">
+                  <nav className="grid gap-y-4">
+                    <Link
+                      to="/"
+                      className="-m-3 flex items-center rounded-md p-3 text-sm font-semibold hover:bg-gray-50"
+                    >
+                      <span className="ml-3 text-base font-medium text-gray-900">
+                        Home
+                      </span>
+                    </Link>
+                  </nav>
                 </div>
                 {isLoggedIn ? (
-                    // Show logout button if user is logged in
-                    <div className="hidden lg:block">
-                        <button
-                            type="button"
-                            className="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                            onClick={handleLogout}
-                        >
-                            Log out
-                        </button>
-                    </div>
+                  <button
+                    type="button"
+                    className="mt-4 w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black my-1"
+                    onClick={handleLogout}
+                  >
+                    logout
+                  </button>
                 ) : (
-                    // Show signin and signup links if user is not logged in
-                    <div className="hidden lg:block">
-                        <Link
-                            to="/signin"
-                            type="button"
-                            className="rounded-md mr-2 bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                        >
-                            Sign in
-                        </Link>
-                        <Link
-                            to="/signup"
-                            type="button"
-                            className="rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                        >
-                            Sign Up
-                        </Link>
-                    </div>
+                  <>
+                    <Link
+                      to="/signin"
+                      type="button"
+                      className="mt-4 w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black my-1"
+                    >
+                      Sign In
+                    </Link>
+                    <Link
+                      to="/signup"
+                      type="button"
+                      className="mt-4 w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
                 )}
-                <div className="lg:hidden">
-                    <Menu onClick={toggleMenu} className="h-6 w-6 cursor-pointer" />
-                </div>
-                {isMenuOpen && (
-                    <div className="absolute inset-x-0 top-0 z-50 origin-top-right transform p-2 transition lg:hidden">
-                        <div className="divide-y-2 divide-gray-50 rounded-lg bg-white shadow-lg ring-1 ring-black ring-opacity-5">
-                            <div className="px-5 pb-6 pt-5">
-                                <div className="flex items-center justify-between">
-                                    <div className="inline-flex items-center space-x-2">
-                                        <span>
-                                            <svg
-                                                width="30"
-                                                height="30"
-                                                viewBox="0 0 50 56"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    d="M23.2732 0.2528C20.8078 1.18964 2.12023 12.2346 1.08477 13.3686C0 14.552 0 14.7493 0 27.7665C0 39.6496 0.0986153 41.1289 0.83823 42.0164C2.12023 43.5449 23.2239 55.4774 24.6538 55.5267C25.9358 55.576 46.1027 44.3832 48.2229 42.4602C49.3077 41.474 49.3077 41.3261 49.3077 27.8158C49.3077 14.3055 49.3077 14.1576 48.2229 13.1714C46.6451 11.7415 27.1192 0.450027 25.64 0.104874C24.9497 -0.0923538 23.9142 0.00625992 23.2732 0.2528ZM20.2161 21.8989C20.2161 22.4906 18.9835 23.8219 17.0111 25.3997C15.2361 26.7803 13.8061 27.9637 13.8061 28.0623C13.8061 28.1116 15.2361 29.0978 16.9618 30.2319C18.6876 31.3659 20.2655 32.6479 20.4134 33.0917C20.8078 34.0286 19.871 35.2119 18.8355 35.2119C17.8001 35.2119 9.0233 29.3936 8.67815 28.5061C8.333 27.6186 9.36846 26.5338 14.3485 22.885C17.6521 20.4196 18.4904 20.0252 19.2793 20.4196C19.7724 20.7155 20.2161 21.3565 20.2161 21.8989ZM25.6893 27.6679C23.4211 34.9161 23.0267 35.7543 22.1391 34.8668C21.7447 34.4723 22.1391 32.6479 23.6677 27.9637C26.2317 20.321 26.5275 19.6307 27.2671 20.3703C27.6123 20.7155 27.1685 22.7864 25.6893 27.6679ZM36.0932 23.2302C40.6788 26.2379 41.3198 27.0269 40.3337 28.1609C39.1503 29.5909 31.6555 35.2119 30.9159 35.2119C29.9298 35.2119 28.9436 33.8806 29.2394 33.0424C29.3874 32.6479 30.9652 31.218 32.7403 29.8867L35.9946 27.4706L32.5431 25.1532C30.6201 23.9205 29.0915 22.7371 29.0915 22.5892C29.0915 21.7509 30.2256 20.4196 30.9159 20.4196C31.3597 20.4196 33.6771 21.7016 36.0932 23.2302Z"
-                                                    fill="black"
-                                                />
-                                            </svg>
-                                        </span>
-                                        <span className="font-bold">DevUI</span>
-                                    </div>
-                                    <div className="-mr-2">
-                                        <button
-                                            type="button"
-                                            onClick={toggleMenu}
-                                            className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                                        >
-                                            <span className="sr-only">Close menu</span>
-                                            <X className="h-6 w-6" aria-hidden="true" />
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="mt-6">
-                                    <nav className="grid gap-y-4">
-                                        <Link
-                                            to='/'
-                                            className="-m-3 flex items-center rounded-md p-3 text-sm font-semibold hover:bg-gray-50"
-                                        >
-                                            <span className="ml-3 text-base font-medium text-gray-900">
-                                                Home
-                                            </span>
-                                        </Link>
-                                    </nav>
-                                </div>
-                                {
-                                    isLoggedIn ? <button
-                                        type="button"
-                                        className="mt-4 w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black my-1"
-                                        onClick={handleLogout}
-                                    >
-                                        logout
-                                    </button> :
-                                        <>
-                                            <Link
-                                                to='/signin'
-                                                type="button"
-                                                className="mt-4 w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black my-1"
-                                            >
-                                                Sign In
-                                            </Link>
-                                            <Link
-                                                to='/signup'
-                                                type="button"
-                                                className="mt-4 w-full rounded-md bg-black px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black/80 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black"
-                                            >
-                                                Sign Up
-                                            </Link>
-                                        </>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                )}
+              </div>
             </div>
-        </div>
-    )
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

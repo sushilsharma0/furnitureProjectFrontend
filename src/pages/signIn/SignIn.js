@@ -36,13 +36,15 @@ export function SignIn() {
         email,
         password
       });
-      // console.log(response.data);
+
+      localStorage.setItem("userId" , response.data.id)
+      console.log(response.data);
       cookies.set("USER-TOKEN", response.data.token, {
         path: '/'
       });
       toast.success('login successful', {
         position: "bottom-right",
-        autoClose: 2200,
+        autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -53,7 +55,7 @@ export function SignIn() {
 
       setTimeout(() => {
         navigate("/")
-      }, 2200);
+      }, 1000);
     } catch (error) {
       // console.log(error.message);
       if (error.response && error.response.status === 400) {
